@@ -29,9 +29,9 @@ class MarvelService {
 		return {
 			name: data.name,
 			description:
-				data.description.length > 210
+				(data.description.length > 210
 					? `${data.description.slice(0, 210)}...`
-					: data.description,
+					: data.description) || 'No information was found for this character',
 			thumbnail: `${data.thumbnail.path}.${data.thumbnail.extension}`,
 			homepage: data.urls[0].url,
 			wiki: data.urls[1].url,
