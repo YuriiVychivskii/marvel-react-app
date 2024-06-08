@@ -15,26 +15,26 @@ class MarvelService {
 		return await this.getResource(
 			`${this._apiBase}characters?ts=1&limit=9&offset=210&${this._apiKey}`
 		).then(data =>
-			data.data.results.map(item => this._TransformedCharacter(item))
+			data.data.results.map(item => this._transformCharacter(item))
 		);
 	};
 
 	getCharacterByID = async id => {
 		return await this.getResource(
 			`${this._apiBase}characters/${id}?ts=1&${this._apiKey}`
-		).then(data => this._TransformedCharacter(data.data.results[0]));
+		).then(data => this._transformCharacter(data.data.results[0]));
 	};
 
-	_TransformedCharacter = data => {
+	_transformCharacter = ({ id, name, description, thumbnail, urls }) => {
 		return {
-			name: data.name,
-			description:
-				(data.description.length > 210
-					? `${data.description.slice(0, 210)}...`
-					: data.description) || 'No information was found for this character',
-			thumbnail: `${data.thumbnail.path}.${data.thumbnail.extension}`,
-			homepage: data.urls[0].url,
-			wiki: data.urls[1].url,
+			id: id,
+			name: name,
+			description: description
+				? `${description.slice(0, 210)}...`
+				: 'There is no description for this character',
+			thumbnail: thumbnail.path + '.' + thumbnail.extension,
+			homepage: urls[0].url,
+			wiki: urls[1].url,
 		};
 	};
 }
