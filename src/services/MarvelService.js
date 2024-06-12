@@ -25,7 +25,14 @@ class MarvelService {
 		).then(data => this._transformCharacter(data.data.results[0]));
 	};
 
-	_transformCharacter = ({ id, name, description, thumbnail, urls }) => {
+	_transformCharacter = ({
+		id,
+		name,
+		description,
+		thumbnail,
+		urls,
+		comics,
+	}) => {
 		return {
 			id: id,
 			name: name,
@@ -35,6 +42,7 @@ class MarvelService {
 			thumbnail: thumbnail.path + '.' + thumbnail.extension,
 			homepage: urls[0].url,
 			wiki: urls[1].url,
+			comics: comics.items,
 		};
 	};
 }
