@@ -34,6 +34,16 @@ class CharList extends Component {
 		});
 	};
 
+	onActive = (e, id) => {
+		this.props.onSelectChar(id);
+
+		document
+			.querySelectorAll('.char__item')
+			.forEach(item => item.classList.remove('char__item_selected'));
+
+		e.currentTarget.classList.add('char__item_selected');
+	};
+
 	renderItems(data) {
 		const items = data.map(({ name, thumbnail, id }) => {
 			let imgStyle =
@@ -43,7 +53,7 @@ class CharList extends Component {
 					: { objectFit: 'cover' };
 
 			return (
-				<li className="char__item" key={id}>
+				<li className="char__item" key={id} onClick={e => this.onActive(e, id)}>
 					<img src={thumbnail} alt={name} style={imgStyle} />
 					<div className="char__name">{name}</div>
 				</li>
