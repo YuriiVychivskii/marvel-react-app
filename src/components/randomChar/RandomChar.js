@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import mjolnir from '../../resources/img/mjolnir.png';
 import MarvelService from '../../services/MarvelService';
-import ErrorMassage from '../errorMassage/ErrorMassage';
+import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 import './randomChar.scss';
 
@@ -41,13 +41,13 @@ class RandomChar extends Component {
 	render() {
 		const { char, loading, error } = this.state;
 		const spinner = loading ? <Spinner /> : null;
-		const errorMassage = error ? <ErrorMassage /> : null;
+		const errorMessage = error ? <ErrorMessage /> : null;
 		const content = !(loading || error) ? <View char={char} /> : null;
 
 		return (
 			<div className="randomchar">
 				{spinner}
-				{errorMassage}
+				{errorMessage}
 				{content}
 				<div className="randomchar__static">
 					<p className="randomchar__title">
