@@ -39,7 +39,10 @@ class CharInfo extends Component {
 	updateChar = () => {
 		const { selectedChar } = this.props;
 
-		if (!selectedChar) return;
+		if (!selectedChar) {
+			this.setState({ char: null });
+			return;
+		}
 
 		this.onAddSpinner();
 		this.marvelService

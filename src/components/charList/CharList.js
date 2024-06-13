@@ -37,11 +37,17 @@ class CharList extends Component {
 	onActive = (e, id) => {
 		this.props.onSelectChar(id);
 
-		document
-			.querySelectorAll('.char__item')
-			.forEach(item => item.classList.remove('char__item_selected'));
+		if (e.currentTarget.classList.contains('char__item_selected')) {
+			e.currentTarget.classList.remove('char__item_selected');
 
-		e.currentTarget.classList.add('char__item_selected');
+			this.props.onSelectChar(0);
+		} else {
+			document
+				.querySelectorAll('.char__item')
+				.forEach(item => item.classList.remove('char__item_selected'));
+
+			e.currentTarget.classList.add('char__item_selected');
+		}
 	};
 
 	renderItems(data) {
