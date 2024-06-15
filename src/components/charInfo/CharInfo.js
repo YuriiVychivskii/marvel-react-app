@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { Component } from 'react';
 import MarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
@@ -112,4 +113,9 @@ const View = ({ char }) => {
 		</>
 	);
 };
+
+CharInfo.propTypes = {
+	selectedChar: PropTypes.number,
+};
+
 export default CharInfo;
