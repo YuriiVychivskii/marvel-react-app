@@ -9,8 +9,9 @@ class CharList extends Component {
 		charList: [],
 		loading: true,
 		error: false,
-		offset: 219,
+		offset: 210,
 		newItemsLoading: true,
+		charListEmpty: false,
 	};
 
 	marvelService = new MarvelService();
@@ -31,6 +32,11 @@ class CharList extends Component {
 	};
 
 	onCharListLoaded = newCharList => {
+		let charListEmpty = false;
+		if (newCharList.length < 9) {
+			charListEmpty = true;
+		}
+
 		this.setState(({ charList, offset }) => {
 			const combinedList = [...charList, ...newCharList];
 			const uniqueCharList = combinedList.filter(
@@ -43,6 +49,7 @@ class CharList extends Component {
 				loading: false,
 				offset: offset + 9,
 				newItemsLoading: false,
+				charListEmpty,
 			};
 		});
 	};
@@ -93,7 +100,8 @@ class CharList extends Component {
 	}
 
 	render() {
-		const { charList, loading, error, newItemsLoading, offset } = this.state;
+		const { charList, loading, error, newItemsLoading, offset, charListEmpty } =
+			this.state;
 
 		const items = this.renderItems(charList);
 
@@ -108,6 +116,7 @@ class CharList extends Component {
 				{content}
 				<button
 					disabled={newItemsLoading}
+					style={{ display: charListEmpty ? 'none' : 'block' }}
 					onClick={() => this.onRequest(offset)}
 					className="button button__main button__long"
 				>
