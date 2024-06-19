@@ -66,24 +66,49 @@ class CharList extends Component {
 		});
 	};
 
-	onActive = (e, id) => {
-		this.props.onSelectChar(id);
+	// onActive = (e, id) => {
+	// 	this.props.onSelectChar(id);
 
-		if (e.currentTarget.classList.contains('char__item_selected')) {
-			e.currentTarget.classList.remove('char__item_selected');
+	// 	if (e.currentTarget.classList.contains('char__item_selected')) {
+	// 		e.currentTarget.classList.remove('char__item_selected');
 
-			this.props.onSelectChar(0);
+	// 		this.props.onSelectChar(0);
+	// 	} else {
+	// 		document
+	// 			.querySelectorAll('.char__item')
+	// 			.forEach(item => item.classList.remove('char__item_selected'));
+
+	// 		e.currentTarget.classList.add('char__item_selected');
+	// 	}
+	// };
+
+	itemsRef = [];
+
+	onAddRefs = ref => {
+		this.itemsRef.push(ref);
+	};
+
+	onActive = i => {
+		if (this.itemsRef[i].classList.contains('char__item_selected')) {
+			this.props.onSelectChar(null);
+			this.itemsRef[i].classList.remove('char__item_selected');
 		} else {
-			document
-				.querySelectorAll('.char__item')
-				.forEach(item => item.classList.remove('char__item_selected'));
+			this.itemsRef.forEach(item =>
+				item.classList.remove('char__item_selected')
+			);
+			this.itemsRef[i].classList.add('char__item_selected');
+			this.itemsRef[i].focus();
+		}
+	};
 
-			e.currentTarget.classList.add('char__item_selected');
+	checkTabPress = (event, key_val) => {
+		if (event.keyCode === 9) {
+			this.onActive(key_val);
 		}
 	};
 
 	renderItems(data) {
-		const items = data.map(({ name, thumbnail, id }) => {
+		const items = data.map(({ name, thumbnail, id }, i) => {
 			let imgStyle =
 				thumbnail ===
 				'http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg'
@@ -91,7 +116,20 @@ class CharList extends Component {
 					: { objectFit: 'cover' };
 
 			return (
-				<li className="char__item" key={id} onClick={e => this.onActive(e, id)}>
+				<li
+					className="char__item"
+					key={id}
+					onClick={() => {
+						this.props.onSelectChar(id);
+						this.onActive(i);
+					}}
+					ref={this.onAddRefs}
+					tabIndex={0}
+					onKeyUp={e => {
+						this.props.onSelectChar(id);
+						this.checkTabPress(e, i);
+					}}
+				>
 					<img src={thumbnail} alt={name} style={imgStyle} />
 					<div className="char__name">{name}</div>
 				</li>
