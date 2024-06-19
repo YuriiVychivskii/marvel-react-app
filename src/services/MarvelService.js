@@ -1,5 +1,5 @@
 class MarvelService {
-	_apiBase = 'http://gateway.marvel.com/v1/public/';
+	_apiBase = 'https://gateway.marvel.com/v1/public/';
 	_apiKey =
 		'apikey=b385361f7e9b608aa0a767131dfa968e&hash=9c035c0ddd58115d76cf41112b2af2f8';
 	_offsetChar = 210;
