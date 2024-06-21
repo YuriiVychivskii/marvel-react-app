@@ -1,113 +1,80 @@
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
 import MarvelService from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
+
 import './charList.scss';
 
-class CharList extends Component {
-	state = {
-		charList: [],
-		loading: true,
-		error: false,
-		offset: 210,
-		newItemsLoading: true,
-		charListEmpty: false,
-	};
+const CharList = props => {
+	const [charList, setCharList] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(false);
+	const [offset, setOffset] = useState(210);
+	const [newItemsLoading, setNewItemsLoading] = useState(true);
+	const [charListEmpty, setCharListEmpty] = useState(false);
 
-	marvelService = new MarvelService();
+	const marvelService = new MarvelService();
 
-	componentDidMount() {
-		this.marvelService
-			.getAllCharacters()
-			.then(this.onCharListLoaded)
-			.catch(this.onError);
-	}
+	useEffect(() => onRequest(), []);
 
-	onRequest = offset => {
-		this.onCharListLoading();
-		this.marvelService
+	const onRequest = offset => {
+		onCharListLoading();
+		marvelService
 			.getAllCharacters(offset)
-			.then(this.onCharListLoaded)
-			.catch(this.onError);
+			.then(onCharListLoaded)
+			.catch(onError);
 	};
 
-	onCharListLoaded = newCharList => {
+	const onCharListLoaded = newCharList => {
 		let charListEmpty = false;
 		if (newCharList.length < 9) {
 			charListEmpty = true;
 		}
 
-		this.setState(({ charList, offset }) => {
-			const combinedList = [...charList, ...newCharList];
-			const uniqueCharList = combinedList.filter(
-				(character, index, self) =>
-					index === self.findIndex(c => c.id === character.id)
-			);
+		const combinedList = [...charList, ...newCharList];
+		const uniqueCharList = combinedList.filter(
+			(character, index, self) =>
+				index === self.findIndex(c => c.id === character.id)
+		);
 
-			return {
-				charList: uniqueCharList,
-				loading: false,
-				offset: offset + 9,
-				newItemsLoading: false,
-				charListEmpty,
-			};
-		});
+		setCharList(uniqueCharList);
+		setLoading(false);
+		setOffset(offset => offset + 9);
+		setNewItemsLoading(false);
+		setCharListEmpty(charListEmpty);
 	};
 
-	onCharListLoading = () => {
-		this.setState({ newItemsLoading: true });
+	const onCharListLoading = () => {
+		setNewItemsLoading(true);
 	};
 
-	onError = () => {
-		this.setState({
-			error: true,
-			loading: false,
-		});
+	const onError = () => {
+		setError(true);
+		setLoading(false);
 	};
 
-	// onActive = (e, id) => {
-	// 	this.props.onSelectChar(id);
+	const itemsRef = useRef([]);
 
-	// 	if (e.currentTarget.classList.contains('char__item_selected')) {
-	// 		e.currentTarget.classList.remove('char__item_selected');
-
-	// 		this.props.onSelectChar(0);
-	// 	} else {
-	// 		document
-	// 			.querySelectorAll('.char__item')
-	// 			.forEach(item => item.classList.remove('char__item_selected'));
-
-	// 		e.currentTarget.classList.add('char__item_selected');
-	// 	}
-	// };
-
-	itemsRef = [];
-
-	onAddRefs = ref => {
-		this.itemsRef.push(ref);
-	};
-
-	onActive = i => {
-		if (this.itemsRef[i].classList.contains('char__item_selected')) {
-			this.props.onSelectChar(null);
-			this.itemsRef[i].classList.remove('char__item_selected');
+	const onActive = i => {
+		if (itemsRef.current[i].classList.contains('char__item_selected')) {
+			props.onSelectChar(null);
+			itemsRef.current[i].classList.remove('char__item_selected');
 		} else {
-			this.itemsRef.forEach(item =>
+			itemsRef.current.forEach(item =>
 				item.classList.remove('char__item_selected')
 			);
-			this.itemsRef[i].classList.add('char__item_selected');
-			this.itemsRef[i].focus();
+			itemsRef.current[i].classList.add('char__item_selected');
+			itemsRef.current[i].focus();
 		}
 	};
 
-	checkTabPress = (event, key_val) => {
-		if (event.keyCode === 9) {
-			this.onActive(key_val);
-		}
+	const checkTabPress = (event, key_val) => {
+		if (event.keyCode === 9) onActive(key_val);
 	};
 
-	renderItems(data) {
+	const renderItems = data => {
 		const items = data.map(({ name, thumbnail, id }, i) => {
 			let imgStyle =
 				thumbnail ===
@@ -120,14 +87,14 @@ class CharList extends Component {
 					className="char__item"
 					key={id}
 					onClick={() => {
-						this.props.onSelectChar(id);
-						this.onActive(i);
+						props.onSelectChar(id);
+						onActive(i);
 					}}
-					ref={this.onAddRefs}
+					ref={el => (itemsRef.current[i] = el)}
 					tabIndex={0}
 					onKeyUp={e => {
-						this.props.onSelectChar(id);
-						this.checkTabPress(e, i);
+						props.onSelectChar(id);
+						checkTabPress(e, i);
 					}}
 				>
 					<img src={thumbnail} alt={name} style={imgStyle} />
@@ -136,35 +103,29 @@ class CharList extends Component {
 			);
 		});
 		return <ul className="char__grid">{items}</ul>;
-	}
+	};
+	const items = renderItems(charList);
 
-	render() {
-		const { charList, loading, error, newItemsLoading, offset, charListEmpty } =
-			this.state;
+	const errorMessage = error ? <ErrorMessage /> : null;
+	const spinner = loading ? <Spinner /> : null;
+	const content = !(loading || error) ? items : null;
 
-		const items = this.renderItems(charList);
-
-		const errorMessage = error ? <ErrorMessage /> : null;
-		const spinner = loading ? <Spinner /> : null;
-		const content = !(loading || error) ? items : null;
-
-		return (
-			<div className="char__list">
-				{errorMessage}
-				{spinner}
-				{content}
-				<button
-					disabled={newItemsLoading}
-					style={{ display: charListEmpty ? 'none' : 'block' }}
-					onClick={() => this.onRequest(offset)}
-					className="button button__main button__long"
-				>
-					<div className="inner">load more</div>
-				</button>
-			</div>
-		);
-	}
-}
+	return (
+		<div className="char__list">
+			{errorMessage}
+			{spinner}
+			{content}
+			<button
+				disabled={newItemsLoading}
+				style={{ display: charListEmpty ? 'none' : 'block' }}
+				onClick={() => onRequest(offset)}
+				className="button button__main button__long"
+			>
+				<div className="inner">load more</div>
+			</button>
+		</div>
+	);
+};
 
 CharList.propTypes = {
 	onSelectChar: PropTypes.func.isRequired,
