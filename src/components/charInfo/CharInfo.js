@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
-import MarvelService from '../../services/MarvelService';
+import { useMarvelService } from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
 import Spinner from '../spinner/Spinner';
@@ -9,38 +9,21 @@ import Spinner from '../spinner/Spinner';
 import './charInfo.scss';
 
 const CharInfo = ({ selectedChar }) => {
-	const [char, setChar] = useState(null);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(false);
+	const { loading, error, getCharacterByID } = useMarvelService();
 
-	const marvelService = new MarvelService();
+	const [char, setChar] = useState(null);
 
 	useEffect(() => updateChar(), []);
-
 	useEffect(() => updateChar(), [selectedChar]);
 
-	const onAddChar = char => {
-		setChar(char);
-		setLoading(false);
-	};
-
-	const onAddSpinner = () => {
-		setLoading(true);
-	};
-
-	const onError = () => {
-		setLoading(false);
-		setError(true);
-	};
+	const onAddChar = char => setChar(char);
 
 	const updateChar = () => {
 		if (!selectedChar) {
 			setChar(null);
 			return;
 		}
-
-		onAddSpinner();
-		marvelService.getCharacterByID(selectedChar).then(onAddChar).catch(onError);
+		getCharacterByID(selectedChar).then(onAddChar);
 	};
 
 	const skeleton = char || loading || error ? null : <Skeleton />;

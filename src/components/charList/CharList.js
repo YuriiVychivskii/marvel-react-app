@@ -1,30 +1,25 @@
 import PropTypes from 'prop-types';
 import { useEffect, useRef, useState } from 'react';
 
-import MarvelService from '../../services/MarvelService';
+import { useMarvelService } from '../../services/MarvelService';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 
 import './charList.scss';
 
 const CharList = props => {
+	const { loading, error, getAllCharacters } = useMarvelService();
+
 	const [charList, setCharList] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(false);
 	const [offset, setOffset] = useState(210);
 	const [newItemsLoading, setNewItemsLoading] = useState(true);
 	const [charListEmpty, setCharListEmpty] = useState(false);
 
-	const marvelService = new MarvelService();
-
 	useEffect(() => onRequest(), []);
 
 	const onRequest = offset => {
-		onCharListLoading();
-		marvelService
-			.getAllCharacters(offset)
-			.then(onCharListLoaded)
-			.catch(onError);
+		setNewItemsLoading(false);
+		getAllCharacters(offset).then(onCharListLoaded);
 	};
 
 	const onCharListLoaded = newCharList => {
@@ -40,19 +35,9 @@ const CharList = props => {
 		);
 
 		setCharList(uniqueCharList);
-		setLoading(false);
 		setOffset(offset => offset + 9);
 		setNewItemsLoading(false);
 		setCharListEmpty(charListEmpty);
-	};
-
-	const onCharListLoading = () => {
-		setNewItemsLoading(true);
-	};
-
-	const onError = () => {
-		setError(true);
-		setLoading(false);
 	};
 
 	const itemsRef = useRef([]);
@@ -107,14 +92,13 @@ const CharList = props => {
 	const items = renderItems(charList);
 
 	const errorMessage = error ? <ErrorMessage /> : null;
-	const spinner = loading ? <Spinner /> : null;
-	const content = !(loading || error) ? items : null;
+	const spinner = loading && !newItemsLoading ? <Spinner /> : null;
 
 	return (
 		<div className="char__list">
 			{errorMessage}
 			{spinner}
-			{content}
+			{items}
 			<button
 				disabled={newItemsLoading}
 				style={{ display: charListEmpty ? 'none' : 'block' }}
