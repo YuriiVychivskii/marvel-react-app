@@ -24,17 +24,9 @@ const CharList = props => {
 
 	const onCharListLoaded = newCharList => {
 		let charListEmpty = false;
-		if (newCharList.length < 9) {
-			charListEmpty = true;
-		}
+		if (newCharList.length < 9) charListEmpty = true;
 
-		const combinedList = [...charList, ...newCharList];
-		const uniqueCharList = combinedList.filter(
-			(character, index, self) =>
-				index === self.findIndex(c => c.id === character.id)
-		);
-
-		setCharList(uniqueCharList);
+		setCharList(charList => [...charList, ...newCharList]);
 		setOffset(offset => offset + 9);
 		setNewItemsLoading(false);
 		setCharListEmpty(charListEmpty);
