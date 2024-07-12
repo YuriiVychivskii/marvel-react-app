@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
-
 import { useMarvelService } from '../../services/MarvelService';
+
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
 import Spinner from '../spinner/Spinner';
@@ -9,7 +9,7 @@ import Spinner from '../spinner/Spinner';
 import './charInfo.scss';
 
 const CharInfo = ({ selectedChar }) => {
-	const { loading, error, getCharacterByID } = useMarvelService();
+	const { loading, error, getCharacterByID, clearError } = useMarvelService();
 
 	const [char, setChar] = useState(null);
 
@@ -23,6 +23,7 @@ const CharInfo = ({ selectedChar }) => {
 			setChar(null);
 			return;
 		}
+		clearError();
 		getCharacterByID(selectedChar).then(onAddChar);
 	};
 
