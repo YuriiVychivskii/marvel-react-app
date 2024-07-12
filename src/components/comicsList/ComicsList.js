@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useMarvelService } from '../../services/MarvelService';
+
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
+
 import './comicsList.scss';
 
 const ComicsList = () => {
@@ -33,11 +36,11 @@ const ComicsList = () => {
 		const items = data.map(({ id, title, thumbnail, prices }) => {
 			return (
 				<li key={id} tabIndex={0} className="comics__item">
-					<a href="#">
+					<Link to={`/comics/${id}`}>
 						<img src={thumbnail} alt={title} className="comics__item-img" />
 						<div className="comics__item-name">{title}</div>
 						<div className="comics__item-price">{prices}</div>
-					</a>
+					</Link>
 				</li>
 			);
 		});
